@@ -12,10 +12,14 @@ class ELEMENTAL_API AElementalCharacter : public ACharacter
 {
 	GENERATED_BODY()
 protected:
-	UPROPERTY(EditAnywhere, Category = "Camera")
+	UPROPERTY(EditAnywhere, Category ="Camera")
 		class USpringArmComponent* SpringArmComp = nullptr;
 	UPROPERTY(EditAnywhere, Category="Camera")
 		class UCameraComponent* ThirdPersonCamera = nullptr;
+	UPROPERTY(EditAnywhere, Category="Camera")
+		float CameraRotationSpeed = 0.5;
+	UPROPERTY(EditAnywhere, Category="Camera")
+		FVector2D CameraPitchClamp = FVector2D(-137, 0);
 
 	UPROPERTY(EditAnywhere, Category="Dash")
 		float DashForceMultiplier = 10;
@@ -41,6 +45,7 @@ protected:
 	virtual void BeginPlay() override;
 	void MoveForward(const float axis);
 	void MoveRight(const float axis);
+	void TurnCamera(const float Axis);
 	void Dash();
 
 private:
