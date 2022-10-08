@@ -13,20 +13,20 @@ class ELEMENTAL_API AElementalCharacter : public ACharacter
 	GENERATED_BODY()
 protected:
 	UPROPERTY(EditAnywhere, Category ="Camera")
-		class USpringArmComponent* SpringArmComp = nullptr;
+		class USpringArmComponent* _springArmComp = nullptr;
 	UPROPERTY(EditAnywhere, Category="Camera")
-		class UCameraComponent* ThirdPersonCamera = nullptr;
+		class UCameraComponent* _thirdPersonCamera = nullptr;
 	UPROPERTY(EditAnywhere, Category="Camera")
-		float CameraRotationSpeed = 0.5;
+		float _cameraRotationSpeed = 0.5;
 	UPROPERTY(EditAnywhere, Category="Camera")
-		FVector2D CameraPitchClamp = FVector2D(-137, 0);
+		FVector2D _cameraPitchClamp = FVector2D(-137, 0);
 
 	UPROPERTY(EditAnywhere, Category="Dash")
-		float DashForceMultiplier = 10;
+		float _dashForceMultiplier = 10;
 	UPROPERTY(EditAnywhere, Category="Dash")
-		int NumOfDashes = 1;
+		int _numOfDashes = 1;
 	UPROPERTY(EditAnywhere, Category="Dash")
-		float DashCoolDown = 1.5;
+		float _dashCoolDown = 1.5;
 
 private:
 	int CurrentNumDashes = 0;
@@ -35,7 +35,7 @@ private:
 	
 public:
 	// Sets default values for this character's properties
-	AElementalCharacter();
+	AElementalCharacter(const FObjectInitializer& ObjectInitializer);
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -43,9 +43,11 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	void MoveForward(const float axis);
-	void MoveRight(const float axis);
+	void MoveForward(const float Axis);
+	void MoveRight(const float Axis);
+	void CharJump();
 	void TurnCamera(const float Axis);
+	void CameraUp(const float Axis);
 	void Dash();
 
 private:
