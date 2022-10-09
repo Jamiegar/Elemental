@@ -17,7 +17,7 @@ AElementalCharacter::AElementalCharacter(const FObjectInitializer& ObjectInitial
 
 	_springArmComp->SetupAttachment(GetRootComponent());
 	_thirdPersonCamera->SetupAttachment(_springArmComp);
-
+	
 	_springArmComp->bEnableCameraLag = true;
 	_springArmComp->bUsePawnControlRotation = true;
 	CurrentNumDashes = _numOfDashes;
@@ -45,13 +45,11 @@ void AElementalCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
 void AElementalCharacter::MoveForward(const float Axis)
 {
-	//AddMovementInput(GetActorForwardVector() * Axis);
 	static_cast<UCharacterCurveMovementComponent*>(GetCharacterMovement())->AddCurveForwardBackMovement(GetActorForwardVector(), Axis);
 }
 
 void AElementalCharacter::MoveRight(const float Axis)
 {
-	//AddMovementInput(GetActorRightVector() * Axis);
 	static_cast<UCharacterCurveMovementComponent*>(GetCharacterMovement())->AddCurveRightLeftMovement(GetActorRightVector(), Axis);
 }
 

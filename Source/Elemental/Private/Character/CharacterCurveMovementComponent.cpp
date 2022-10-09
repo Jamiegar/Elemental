@@ -6,7 +6,6 @@
 #include "Components/CapsuleComponent.h"
 
 
-
 void UCharacterCurveMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -15,17 +14,25 @@ void UCharacterCurveMovementComponent::BeginPlay()
 	_jumpCurveValues = CurveValues(_jumpCurve); 
 	_moveRightLeftCurveValues = CurveValues(_movementCurve);
 	_moveForwardBackCurveValues = CurveValues(_movementCurve);
+
+	MaxWalkSpeed = _movementCurve->GetFloatValue(_moveRightLeftCurveValues.MaxCurveTime);
 }
 
 void UCharacterCurveMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
+	
 	JumpUpdate(DeltaTime);
+	
 }
 
 void UCharacterCurveMovementComponent::AddCurveRightLeftMovement(const FVector MovementDirection, float AxisValue)
 {
+	if(!_movementCurve)
+		return;
+
+	AxisValue = FMath::Clamp(AxisValue, 0.0f, 1.0f);
+	
 	if(AxisValue == 0)
 	{
 		_isMoving =false;
@@ -33,15 +40,20 @@ void UCharacterCurveMovementComponent::AddCurveRightLeftMovement(const FVector M
 		return;
 	}
 	
-	if(!_movementCurve)
-		return;
 	
 	_isMoving = true;
+	movementVel = FVector::Zero();
 	MovementUpdate(FApp::GetDeltaTime(), MovementDirection, AxisValue, &_moveRightLeftCurveValues);
+	Velocity = movementVel;
 }
 
 void UCharacterCurveMovementComponent::AddCurveForwardBackMovement(const FVector MovementDirection, float AxisValue)
 {
+	if(!_movementCurve)
+		return;
+
+	AxisValue = FMath::Clamp(AxisValue, 0.0f, 1.0f);
+	
 	if(AxisValue == 0)
 	{
 		_isMoving =false;
@@ -49,30 +61,30 @@ void UCharacterCurveMovementComponent::AddCurveForwardBackMovement(const FVector
 		return;
 	}
 	
-	if(!_movementCurve)
-		return;
-	
 	_isMoving = true;
+	movementVel = FVector::Zero();
 	MovementUpdate(FApp::GetDeltaTime(), MovementDirection, AxisValue, &_moveForwardBackCurveValues);
+	Velocity = movementVel;
 }
 
 void UCharacterCurveMovementComponent::MovementUpdate(float DeltaTime, const FVector MovementDirection, const float Axis, CurveValues* Curves)
 {
 	if(_isMoving && _movementCurve)
 	{
-		Curves->Time = Curves->Time + DeltaTime;
-		
-		float moveCurveVal = _movementCurve->GetFloatValue(Curves->Time);
-		float moveCurveValDelta = moveCurveVal - Curves->PrevCurveVal;
-		Curves->PrevCurveVal = moveCurveVal;
-		
-
-		FVector location = GetActorLocation();
-		FVector newLocation = location + (MovementDirection * Axis * DeltaTime * moveCurveVal);
-		
-		Velocity = (newLocation - location) / DeltaTime;
-
-		//UE_LOG(LogTemp, Warning, TEXT("Velocity: %s"), *Velocity.ToString())
+		Curves->Time += DeltaTime;
+		if(Curves->Time <= Curves->MaxCurveTime)
+		{
+			float moveCurveVal = _movementCurve->GetFloatValue(Curves->Time);
+			float moveAccelerationCurve = moveCurveVal - Curves->PrevCurveVal;
+			Curves->PrevCurveVal = moveCurveVal;
+			
+			movementVel += moveAccelerationCurve / DeltaTime  * (MovementDirection * Axis);
+		}
+		else
+		{
+			CharacterOwner->AddMovementInput(MovementDirection, Axis);
+			UE_LOG(LogTemp, Warning, TEXT("Velocity: %f"), MaxWalkSpeed);
+		}
 	}
 }
 
@@ -152,7 +164,4 @@ void UCharacterCurveMovementComponent::JumpUpdate(float DeltaTime)
 	}
 }
 
-void UCharacterCurveMovementComponent::UpdateCurveMovement()
-{
-		
-}
+

@@ -61,6 +61,7 @@ private:
 	CurveValues _moveRightLeftCurveValues;
 	CurveValues _moveForwardBackCurveValues;
 
+	FVector movementVel;
 	
 
 protected:
@@ -74,7 +75,5 @@ public:
 	virtual void AddCurveRightLeftMovement(const FVector MovementDirection, float AxisValue);
 	virtual void AddCurveForwardBackMovement(const FVector MovementDirection, float AxisValue);
 	void MovementUpdate(float DeltaTime, const FVector MovementDirection, const float Axis, CurveValues* Curves);
-
-	void UpdateCurveMovement();
 	
 };
