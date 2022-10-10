@@ -58,11 +58,13 @@ private:
 	CurveValues _jumpCurveValues;
 
 	bool _isMoving = false;
-	CurveValues _moveRightLeftCurveValues;
-	CurveValues _moveForwardBackCurveValues;
+	CurveValues _moveCurveValues;
 
-	FVector movementVel;
+	float _rightAxis;
+	float _forwardAxis;
 	
+	FVector _rightMovementDir;
+	FVector _forwardMovementDir;
 
 protected:
 	virtual void BeginPlay() override;
@@ -71,9 +73,10 @@ protected:
 public:
 	virtual bool DoJump(bool bReplayingMoves) override;
 	void JumpUpdate(float DeltaTime);
+	void FallGroundCheck();
 
 	virtual void AddCurveRightLeftMovement(const FVector MovementDirection, float AxisValue);
 	virtual void AddCurveForwardBackMovement(const FVector MovementDirection, float AxisValue);
-	void MovementUpdate(float DeltaTime, const FVector MovementDirection, const float Axis, CurveValues* Curves);
+	void MovementUpdate(float DeltaTime);
 	
 };

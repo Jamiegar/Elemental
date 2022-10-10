@@ -46,6 +46,7 @@ void AElementalCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 void AElementalCharacter::MoveForward(const float Axis)
 {
 	static_cast<UCharacterCurveMovementComponent*>(GetCharacterMovement())->AddCurveForwardBackMovement(GetActorForwardVector(), Axis);
+	
 }
 
 void AElementalCharacter::MoveRight(const float Axis)

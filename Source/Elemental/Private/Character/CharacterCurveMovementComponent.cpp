@@ -1,6 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Character/CharacterCurveMovementComponent.h"
+
+#include <string>
+
 #include "GameFramework/Character.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Components/CapsuleComponent.h"
@@ -12,79 +15,77 @@ void UCharacterCurveMovementComponent::BeginPlay()
 
 	//Set default values of curve in Curve Values Constructor 
 	_jumpCurveValues = CurveValues(_jumpCurve); 
-	_moveRightLeftCurveValues = CurveValues(_movementCurve);
-	_moveForwardBackCurveValues = CurveValues(_movementCurve);
+	_moveCurveValues = CurveValues(_movementCurve);
 
-	MaxWalkSpeed = _movementCurve->GetFloatValue(_moveRightLeftCurveValues.MaxCurveTime);
+	MaxWalkSpeed = _movementCurve->GetFloatValue(_moveCurveValues.MaxCurveTime);
 }
 
 void UCharacterCurveMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	
+
 	JumpUpdate(DeltaTime);
-	
+	MovementUpdate(DeltaTime);
 }
 
 void UCharacterCurveMovementComponent::AddCurveRightLeftMovement(const FVector MovementDirection, float AxisValue)
 {
 	if(!_movementCurve)
-		return;
-
-	AxisValue = FMath::Clamp(AxisValue, 0.0f, 1.0f);
-	
-	if(AxisValue == 0)
 	{
-		_isMoving =false;
-		_moveRightLeftCurveValues.SetUpCurveValues(_movementCurve);
+		GetCharacterOwner()->AddMovementInput(MovementDirection, AxisValue);
 		return;
 	}
-	
+
+	AxisValue = FMath::Clamp(AxisValue, -1.0f, 1.0f);
 	
 	_isMoving = true;
-	movementVel = FVector::Zero();
-	MovementUpdate(FApp::GetDeltaTime(), MovementDirection, AxisValue, &_moveRightLeftCurveValues);
-	Velocity = movementVel;
+	_rightAxis = AxisValue;
+	_rightMovementDir = MovementDirection;
 }
 
 void UCharacterCurveMovementComponent::AddCurveForwardBackMovement(const FVector MovementDirection, float AxisValue)
 {
 	if(!_movementCurve)
-		return;
-
-	AxisValue = FMath::Clamp(AxisValue, 0.0f, 1.0f);
-	
-	if(AxisValue == 0)
 	{
-		_isMoving =false;
-		_moveForwardBackCurveValues.SetUpCurveValues(_movementCurve);
+		GetCharacterOwner()->AddMovementInput(MovementDirection, AxisValue);
 		return;
 	}
+
+	AxisValue = FMath::Clamp(AxisValue, -1.0f, 1.0f);
 	
 	_isMoving = true;
-	movementVel = FVector::Zero();
-	MovementUpdate(FApp::GetDeltaTime(), MovementDirection, AxisValue, &_moveForwardBackCurveValues);
-	Velocity = movementVel;
+	_forwardAxis = AxisValue;
+	_forwardMovementDir = MovementDirection;
 }
 
-void UCharacterCurveMovementComponent::MovementUpdate(float DeltaTime, const FVector MovementDirection, const float Axis, CurveValues* Curves)
+void UCharacterCurveMovementComponent::MovementUpdate(float DeltaTime)
 {
-	if(_isMoving && _movementCurve)
+	if(_forwardAxis == 0 && _rightAxis == 0)
 	{
-		Curves->Time += DeltaTime;
-		if(Curves->Time <= Curves->MaxCurveTime)
+		_isMoving =false;
+		_moveCurveValues.SetUpCurveValues(_movementCurve);
+		return;
+	}
+
+	if(_isMoving && _movementCurve && MovementMode == MOVE_Walking)
+	{
+		_moveCurveValues.Time += DeltaTime;
+		if(_moveCurveValues.Time <= _moveCurveValues.MaxCurveTime)
 		{
-			float moveCurveVal = _movementCurve->GetFloatValue(Curves->Time);
-			float moveAccelerationCurve = moveCurveVal - Curves->PrevCurveVal;
-			Curves->PrevCurveVal = moveCurveVal;
+			const float moveCurveVal = _movementCurve->GetFloatValue(_moveCurveValues.Time);
+			const float moveAccelerationCurve = moveCurveVal - _moveCurveValues.PrevCurveVal;
+			_moveCurveValues.PrevCurveVal = moveCurveVal;
 			
-			movementVel += moveAccelerationCurve / DeltaTime  * (MovementDirection * Axis);
+			Velocity = moveAccelerationCurve / DeltaTime  * ((_forwardMovementDir * _forwardAxis) + (_rightMovementDir* _rightAxis));
+			//UE_LOG(LogTemp, Warning, TEXT("RightLeft: %s"), *FVector(_rightLeftAxis + _rightLeftAxis).ToString());
 		}
 		else
 		{
-			CharacterOwner->AddMovementInput(MovementDirection, Axis);
-			UE_LOG(LogTemp, Warning, TEXT("Velocity: %f"), MaxWalkSpeed);
+			GetCharacterOwner()->AddMovementInput(_forwardMovementDir, _forwardAxis);
+			GetCharacterOwner()->AddMovementInput(_rightMovementDir, _rightAxis);
+			//UE_LOG(LogTemp, Warning, TEXT("Velocity: %f"), MaxWalkSpeed);
 		}
+		
 	}
 }
 
@@ -152,16 +153,35 @@ void UCharacterCurveMovementComponent::JumpUpdate(float DeltaTime)
 			FLatentActionInfo latentInfo;
 			latentInfo.CallbackTarget = this;
 
-			UKismetSystemLibrary::MoveComponentTo((USceneComponent*)CharacterOwner->GetCapsuleComponent(), jumpDestination, CharacterOwner->GetActorRotation(),
+			UKismetSystemLibrary::MoveComponentTo(CharacterOwner->GetCapsuleComponent(), jumpDestination, CharacterOwner->GetActorRotation(),
 												  false, false, 0.0f, true, EMoveComponentAction::Type::Move, latentInfo);
+
+			FallGroundCheck();
 		}
 		else
 		{
-			_isJumping = false;
-			CharacterOwner->ResetJumpState();
-			SetMovementMode(MOVE_Walking);
+			FallGroundCheck();
 		}
 	}
 }
 
+void UCharacterCurveMovementComponent::FallGroundCheck()
+{
+	if(Velocity.Z < 0.0f)
+	{
+		const FVector capsuleLocation = UpdatedComponent->GetComponentLocation();
+		FFindFloorResult floorHit;
+		FindFloor(capsuleLocation, floorHit, false);
 
+		if(floorHit.IsWalkableFloor() && IsValidLandingSpot(capsuleLocation, floorHit.HitResult))
+		{
+			SetMovementMode(MOVE_Walking);
+			CharacterOwner->ResetJumpState();
+			_isJumping = false;
+		}
+		else
+		{
+			SetMovementMode(MOVE_Falling);
+		}
+	}
+}
