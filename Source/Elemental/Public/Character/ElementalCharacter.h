@@ -12,9 +12,9 @@ class ELEMENTAL_API AElementalCharacter : public ACharacter
 {
 	GENERATED_BODY()
 protected:
-	UPROPERTY(EditAnywhere, Category ="Camera")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category ="Camera")
 		class USpringArmComponent* _springArmComp = nullptr;
-	UPROPERTY(EditAnywhere, Category="Camera")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Camera")
 		class UCameraComponent* _thirdPersonCamera = nullptr;
 	UPROPERTY(EditAnywhere, Category="Camera")
 		float _cameraRotationSpeed = 0.5;

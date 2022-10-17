@@ -64,6 +64,7 @@ void UCharacterCurveMovementComponent::MovementUpdate(float DeltaTime)
 	{
 		_isMoving =false;
 		_moveCurveValues.SetUpCurveValues(_movementCurve);
+		_forwardVel = 0;
 		return;
 	}
 
@@ -75,15 +76,22 @@ void UCharacterCurveMovementComponent::MovementUpdate(float DeltaTime)
 			const float moveCurveVal = _movementCurve->GetFloatValue(_moveCurveValues.Time);
 			const float moveAccelerationCurve = moveCurveVal - _moveCurveValues.PrevCurveVal;
 			_moveCurveValues.PrevCurveVal = moveCurveVal;
+
 			
-			Velocity = moveAccelerationCurve / DeltaTime  * ((_forwardMovementDir * _forwardAxis) + (_rightMovementDir* _rightAxis));
-			//UE_LOG(LogTemp, Warning, TEXT("RightLeft: %s"), *FVector(_rightLeftAxis + _rightLeftAxis).ToString());
+			// float accel = (GetMaxSpeed() - _moveCurveValues.PrevCurveVal) / DeltaTime * DeltaTime;
+			// _forwardVel += accel * DeltaTime;
+			// UE_LOG(LogTemp, Warning, TEXT("Acceleration: %f"), accel);
+			//
+			// Velocity = _forwardMovementDir * _forwardVel * _forwardAxis;
+			
+			GetCharacterOwner()->AddMovementInput(_forwardMovementDir, _forwardAxis * moveAccelerationCurve);
+			GetCharacterOwner()->AddMovementInput(_rightMovementDir, _rightAxis * moveAccelerationCurve);
+			
 		}
 		else
 		{
 			GetCharacterOwner()->AddMovementInput(_forwardMovementDir, _forwardAxis);
 			GetCharacterOwner()->AddMovementInput(_rightMovementDir, _rightAxis);
-			//UE_LOG(LogTemp, Warning, TEXT("Velocity: %f"), MaxWalkSpeed);
 		}
 		
 	}

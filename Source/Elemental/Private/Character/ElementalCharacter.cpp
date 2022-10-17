@@ -19,7 +19,7 @@ AElementalCharacter::AElementalCharacter(const FObjectInitializer& ObjectInitial
 	_thirdPersonCamera->SetupAttachment(_springArmComp);
 	
 	_springArmComp->bEnableCameraLag = true;
-	_springArmComp->bUsePawnControlRotation = true;
+	_springArmComp->bUsePawnControlRotation = false;
 	CurrentNumDashes = _numOfDashes;
 	bUseControllerRotationYaw = false;
 }
