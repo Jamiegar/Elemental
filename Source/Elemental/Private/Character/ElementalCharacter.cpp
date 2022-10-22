@@ -12,41 +12,28 @@ AElementalCharacter::AElementalCharacter(const FObjectInitializer& ObjectInitial
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	_springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-	_thirdPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ThirdPersonCamera"));
-
-	_springArmComp->SetupAttachment(GetRootComponent());
-	_thirdPersonCamera->SetupAttachment(_springArmComp);
-	
-	_springArmComp->bEnableCameraLag = true;
-	_springArmComp->bUsePawnControlRotation = false;
 	CurrentNumDashes = _numOfDashes;
 	bUseControllerRotationYaw = false;
 }
 
-// Called when the game starts or when spawned
-void AElementalCharacter::BeginPlay()
+float AElementalCharacter::CalcTotalKnockback(const float Damage)
 {
-	Super::BeginPlay();
+	_totalKnockBackPercentage += Damage;
+	return _totalKnockBackPercentage;
 }
 
-// Called to bind functionality to input
-void AElementalCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void AElementalCharacter::ApplyKnockback(const float Damage, AActor* Inst)
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	//Movement action maps binding 
-	PlayerInputComponent->BindAxis(TEXT("MoveForwardBack"), this, &AElementalCharacter::MoveForward);
-	PlayerInputComponent->BindAxis(TEXT("MoveRightLeft"), this, &AElementalCharacter::MoveRight);
-	PlayerInputComponent->BindAxis(TEXT("Turn"), this, &AElementalCharacter::TurnCamera);
-	PlayerInputComponent->BindAxis(TEXT("LookUp"), this, &AElementalCharacter::CameraUp);
-	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &AElementalCharacter::CharJump);
-	PlayerInputComponent->BindAction(TEXT("Dodge"), IE_Pressed, this, &AElementalCharacter:: Dash);
+	FVector direction = GetActorLocation() - Inst->GetActorLocation(); //Gets the direction away from the actor dealing damage
+	direction.Normalize();
+
+	const FVector launchVel = direction * Damage * _totalKnockBackPercentage;
+	LaunchCharacter(launchVel, false, false);
 }
 
 void AElementalCharacter::MoveForward(const float Axis)
 {
 	static_cast<UCharacterCurveMovementComponent*>(GetCharacterMovement())->AddCurveForwardBackMovement(GetActorForwardVector(), Axis);
-	
 }
 
 void AElementalCharacter::MoveRight(const float Axis)
@@ -57,22 +44,6 @@ void AElementalCharacter::MoveRight(const float Axis)
 void AElementalCharacter::CharJump()
 {
 	Jump();
-}
-
-void AElementalCharacter::TurnCamera(const float Axis)
-{
-	AddControllerYawInput(Axis * _cameraRotationSpeed);
-
-	AController* ActorController = GetController();
-	const FRotator ControlRotation = ActorController->GetControlRotation();
-
-	const float ClampPitch = FMath::ClampAngle(ControlRotation.Pitch, _cameraPitchClamp.X, _cameraPitchClamp.Y);
-	ActorController->SetControlRotation(FRotator(ClampPitch, ControlRotation.Yaw, 0));
-}
-
-void AElementalCharacter::CameraUp(const float Axis)
-{
-	AddControllerPitchInput(Axis * _cameraRotationSpeed);
 }
 
 void AElementalCharacter::Dash()

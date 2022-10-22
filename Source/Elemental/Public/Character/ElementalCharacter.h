@@ -12,15 +12,8 @@ class ELEMENTAL_API AElementalCharacter : public ACharacter
 {
 	GENERATED_BODY()
 protected:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category ="Camera")
-		class USpringArmComponent* _springArmComp = nullptr;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Camera")
-		class UCameraComponent* _thirdPersonCamera = nullptr;
-	UPROPERTY(EditAnywhere, Category="Camera")
-		float _cameraRotationSpeed = 0.5;
-	UPROPERTY(EditAnywhere, Category="Camera")
-		FVector2D _cameraPitchClamp = FVector2D(-137, 0);
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Health")
+		float _totalKnockBackPercentage = 0.0f;
 	UPROPERTY(EditAnywhere, Category="Dash")
 		float _dashForceMultiplier = 10;
 	UPROPERTY(EditAnywhere, Category="Dash")
@@ -35,19 +28,17 @@ private:
 	
 public:
 	// Sets default values for this character's properties
-	AElementalCharacter(const FObjectInitializer& ObjectInitializer);
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	explicit AElementalCharacter(const FObjectInitializer& ObjectInitializer);
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Health")
+		float CalcTotalKnockback(const float Damage);
+	UFUNCTION(BlueprintCallable, Category="Health")
+		void ApplyKnockback(const float Damage ,AActor* Inst);
+
 	void MoveForward(const float Axis);
 	void MoveRight(const float Axis);
 	void CharJump();
-	void TurnCamera(const float Axis);
-	void CameraUp(const float Axis);
 	void Dash();
 
 private:
