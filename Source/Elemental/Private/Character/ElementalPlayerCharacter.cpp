@@ -8,28 +8,27 @@
 AElementalPlayerCharacter::AElementalPlayerCharacter(const FObjectInitializer& ObjectInitializer)
 	:AElementalCharacter(ObjectInitializer)
 {
-	PrimaryActorTick.bCanEverTick = true;
-	_springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-	_thirdPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ThirdPersonCamera"));
+	PrimaryActorTick.bCanEverTick = true; //Actor can tick
+	_springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm")); //Create a spring arm component
+	_thirdPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ThirdPersonCamera")); //Create a camera component 
 
-	_springArmComp->SetupAttachment(GetRootComponent());
-	_thirdPersonCamera->SetupAttachment(_springArmComp);
+	_springArmComp->SetupAttachment(GetRootComponent()); //Attach the spring arm to the root component
+	_thirdPersonCamera->SetupAttachment(_springArmComp); //Attach the camera to the spring arm
 	
-	_springArmComp->bEnableCameraLag = true;
-	_springArmComp->bUsePawnControlRotation = false;
-	bUseControllerRotationYaw = false;
+	_springArmComp->bEnableCameraLag = true; //Enables camera lag on the spring arm so the camera smoothly moves 
+	_springArmComp->bUsePawnControlRotation = true; //Set the pawn control rotation to true so the mouse can rotate the character and spring arm 
+	bUseControllerRotationYaw = false; 
 }
 
 void AElementalPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	//Movement action maps binding 
+	//Movement action maps binding, this binds all of the input to functions that can handle that input
 	PlayerInputComponent->BindAxis(TEXT("MoveForwardBack"), this, &AElementalPlayerCharacter::MoveForward);
 	PlayerInputComponent->BindAxis(TEXT("MoveRightLeft"), this, &AElementalPlayerCharacter::MoveRight);
 	PlayerInputComponent->BindAxis(TEXT("Turn"), this, &AElementalPlayerCharacter::TurnCamera);
 	PlayerInputComponent->BindAxis(TEXT("LookUp"), this, &AElementalPlayerCharacter::CameraUp);
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &AElementalPlayerCharacter::CharJump);
-	PlayerInputComponent->BindAction(TEXT("Dodge"), IE_Pressed, this, &AElementalPlayerCharacter:: Dash);
 }
 
 void AElementalPlayerCharacter::TurnCamera(const float Axis)

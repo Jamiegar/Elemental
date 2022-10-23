@@ -39,10 +39,6 @@ protected:
 	void MoveForward(const float Axis);
 	void MoveRight(const float Axis);
 	void CharJump();
-	void Dash();
-
-private:
-	void ResetDashes();
-	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode) override; 
-
+	
+	
 };
