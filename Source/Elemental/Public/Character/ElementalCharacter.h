@@ -14,17 +14,12 @@ class ELEMENTAL_API AElementalCharacter : public ACharacter
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Health")
 		float _totalKnockBackPercentage = 0.0f;
-	UPROPERTY(EditAnywhere, Category="Dash")
-		float _dashForceMultiplier = 10;
-	UPROPERTY(EditAnywhere, Category="Dash")
-		int _numOfDashes = 1;
-	UPROPERTY(EditAnywhere, Category="Dash")
-		float _dashCoolDown = 1.5;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta=(DisplayName="Can Move"))
+		bool _canMove = true;
 private:
 	int CurrentNumDashes = 0;
-	FTimerHandle CoolDownTimerHandle;
-	bool CanDash = true;
+	float _movementXAxis;
+	float _movementYAxis;
 	
 public:
 	// Sets default values for this character's properties
@@ -35,6 +30,10 @@ protected:
 		float CalcTotalKnockback(const float Damage);
 	UFUNCTION(BlueprintCallable, Category="Health")
 		void ApplyKnockback(const float Damage ,AActor* Inst);
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category= "Axis")
+		inline float MovementXAxis() { return _movementXAxis; }
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category= "Axis")
+		inline float MovementYAxis() { return _movementYAxis; }
 
 	void MoveForward(const float Axis);
 	void MoveRight(const float Axis);

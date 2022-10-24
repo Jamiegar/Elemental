@@ -12,7 +12,6 @@ AElementalCharacter::AElementalCharacter(const FObjectInitializer& ObjectInitial
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	CurrentNumDashes = _numOfDashes;
 	bUseControllerRotationYaw = false;
 }
 
@@ -33,12 +32,20 @@ void AElementalCharacter::ApplyKnockback(const float Damage, AActor* Inst)
 
 void AElementalCharacter::MoveForward(const float Axis)
 {
+	if (_canMove == false)
+		return;
+
 	static_cast<UCharacterCurveMovementComponent*>(GetCharacterMovement())->AddCurveForwardBackMovement(GetActorForwardVector(), Axis);
+	_movementYAxis = Axis;
 }
 
 void AElementalCharacter::MoveRight(const float Axis)
 {
+	if (_canMove == false)
+		return;
+
 	static_cast<UCharacterCurveMovementComponent*>(GetCharacterMovement())->AddCurveRightLeftMovement(GetActorRightVector(), Axis);
+	_movementXAxis = Axis;
 }
 
 void AElementalCharacter::CharJump()
