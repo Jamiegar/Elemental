@@ -16,7 +16,7 @@ AElementalPlayerCharacter::AElementalPlayerCharacter(const FObjectInitializer& O
 	_thirdPersonCamera->SetupAttachment(_springArmComp); //Attach the camera to the spring arm
 	
 	_springArmComp->bEnableCameraLag = true; //Enables camera lag on the spring arm so the camera smoothly moves 
-	_springArmComp->bUsePawnControlRotation = true; //Set the pawn control rotation to true so the mouse can rotate the character and spring arm 
+	_springArmComp->bUsePawnControlRotation = true; //Set the pawn control rotation to true so the mouse can rotate the character and spring arm
 	bUseControllerRotationYaw = false; 
 }
 

@@ -16,7 +16,7 @@ void UCharacterCurveMovementComponent::BeginPlay()
 	//Set default values of curve in Curve Values Constructor 
 	_jumpCurveValues = CurveValues(_jumpCurve); 
 	_moveCurveValues = CurveValues(_movementCurve);
-
+	
 	MaxWalkSpeed = _movementCurve->GetFloatValue(_moveCurveValues.MaxCurveTime);
 }
 
@@ -64,7 +64,6 @@ void UCharacterCurveMovementComponent::MovementUpdate(float DeltaTime)
 	{
 		_isMoving =false;
 		_moveCurveValues.SetUpCurveValues(_movementCurve);
-		_forwardVel = 0;
 		return;
 	}
 

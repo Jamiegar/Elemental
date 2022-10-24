@@ -49,9 +49,10 @@ class ELEMENTAL_API UCharacterCurveMovementComponent : public UCharacterMovement
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="CurveMovement", meta=(DisplayName = "Movement Curve"))
 		UCurveFloat* _movementCurve;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="CurveJump", meta=(DisplayName = "Jump Curve"))
 		UCurveFloat* _jumpCurve;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category="CurveJump", meta=(DisplayName="Fall Curve"))
+		UCurveFloat* _fallCurve;
 
 private:
 	bool _isJumping = false;
@@ -60,13 +61,15 @@ private:
 	bool _isMoving = false;
 	CurveValues _moveCurveValues;
 
+	CurveValues _fallCurveValues;
+
+	
 	float _rightAxis;
 	float _forwardAxis;
-	
 	FVector _rightMovementDir;
 	FVector _forwardMovementDir;
 
-	float _forwardVel;
+	
 
 protected:
 	virtual void BeginPlay() override;
