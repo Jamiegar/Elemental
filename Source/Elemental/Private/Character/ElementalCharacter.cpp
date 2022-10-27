@@ -33,8 +33,10 @@ void AElementalCharacter::ApplyKnockback(const float Damage, AActor* Inst)
 void AElementalCharacter::MoveForward(const float Axis)
 {
 	if (_canMove == false)
+	{
+		static_cast<UCharacterCurveMovementComponent*>(GetCharacterMovement())->AddCurveForwardBackMovement(GetActorForwardVector(), 0);
 		return;
-
+	}
 	static_cast<UCharacterCurveMovementComponent*>(GetCharacterMovement())->AddCurveForwardBackMovement(GetActorForwardVector(), Axis);
 	_movementYAxis = Axis;
 }
@@ -42,7 +44,10 @@ void AElementalCharacter::MoveForward(const float Axis)
 void AElementalCharacter::MoveRight(const float Axis)
 {
 	if (_canMove == false)
+	{
+		static_cast<UCharacterCurveMovementComponent*>(GetCharacterMovement())->AddCurveRightLeftMovement(GetActorRightVector(), 0);
 		return;
+	}
 
 	static_cast<UCharacterCurveMovementComponent*>(GetCharacterMovement())->AddCurveRightLeftMovement(GetActorRightVector(), Axis);
 	_movementXAxis = Axis;
