@@ -45,13 +45,14 @@ void UCharacterCurveMovementComponent::AddCurveRightLeftMovement(const FVector M
 
 void UCharacterCurveMovementComponent::AddCurveForwardBackMovement(const FVector MovementDirection, float AxisValue)
 {
-	if(!_movementCurve)
+	if(!_movementCurve) //Check Movement Curve is valid
 	{
-		GetCharacterOwner()->AddMovementInput(MovementDirection, AxisValue);
+		//If no movement curve implement normal movement
+		GetCharacterOwner()->AddMovementInput(MovementDirection, AxisValue);  
 		return;
 	}
 
-	AxisValue = FMath::Clamp(AxisValue, -1.0f, 1.0f);
+	AxisValue = FMath::Clamp(AxisValue, -1.0f, 1.0f); //Make sure axis value is clamped
 	
 	_isMoving = true;
 	_forwardAxis = AxisValue;
@@ -69,10 +70,16 @@ void UCharacterCurveMovementComponent::MovementUpdate(float DeltaTime)
 
 	if(_isMoving && _movementCurve && MovementMode == MOVE_Walking)
 	{
+		//Add delta time to movement curve time to get the time the player has been pressing input
 		_moveCurveValues.Time += DeltaTime;
-		if(_moveCurveValues.Time <= _moveCurveValues.MaxCurveTime)
+
+		//Check that input has not been held for max curve time
+		if(_moveCurveValues.Time <= _moveCurveValues.MaxCurveTime) 
 		{
+			//Sample Curve at current time input has been held for (returns velocity at that time)
 			const float moveCurveVal = _movementCurve->GetFloatValue(_moveCurveValues.Time);
+	
+			//Calculate the difference in speed to get the acceleration this frame 
 			const float moveAccelerationCurve = moveCurveVal - _moveCurveValues.PrevCurveVal;
 			_moveCurveValues.PrevCurveVal = moveCurveVal;
 
