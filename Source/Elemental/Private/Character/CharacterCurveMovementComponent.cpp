@@ -82,13 +82,7 @@ void UCharacterCurveMovementComponent::MovementUpdate(float DeltaTime)
 			//Calculate the difference in speed to get the acceleration this frame 
 			const float moveAccelerationCurve = moveCurveVal - _moveCurveValues.PrevCurveVal;
 			_moveCurveValues.PrevCurveVal = moveCurveVal;
-
 			
-			// float accel = (GetMaxSpeed() - _moveCurveValues.PrevCurveVal) / DeltaTime * DeltaTime;
-			// _forwardVel += accel * DeltaTime;
-			// UE_LOG(LogTemp, Warning, TEXT("Acceleration: %f"), accel);
-			//
-			// Velocity = _forwardMovementDir * _forwardVel * _forwardAxis;
 			
 			GetCharacterOwner()->AddMovementInput(_forwardMovementDir, _forwardAxis * moveAccelerationCurve);
 			GetCharacterOwner()->AddMovementInput(_rightMovementDir, _rightAxis * moveAccelerationCurve);
@@ -99,7 +93,11 @@ void UCharacterCurveMovementComponent::MovementUpdate(float DeltaTime)
 			GetCharacterOwner()->AddMovementInput(_forwardMovementDir, _forwardAxis);
 			GetCharacterOwner()->AddMovementInput(_rightMovementDir, _rightAxis);
 		}
-		
+	}
+	else if(_isMoving && _movementCurve && (MovementMode == MOVE_Flying || MovementMode == MOVE_Falling))
+	{
+		GetCharacterOwner()->AddMovementInput(_forwardMovementDir, _forwardAxis);
+		GetCharacterOwner()->AddMovementInput(_rightMovementDir, _rightAxis);
 	}
 }
 
