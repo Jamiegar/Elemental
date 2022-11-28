@@ -76,6 +76,12 @@ protected:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void OnJumpStarted();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void OnJumpFinished();
+	
 	virtual bool DoJump(bool bReplayingMoves) override;
 	void JumpUpdate(float DeltaTime);
 	void FallGroundCheck();

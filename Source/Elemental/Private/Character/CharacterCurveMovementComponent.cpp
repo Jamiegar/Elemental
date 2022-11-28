@@ -28,6 +28,7 @@ void UCharacterCurveMovementComponent::TickComponent(float DeltaTime, ELevelTick
 	MovementUpdate(DeltaTime);
 }
 
+
 void UCharacterCurveMovementComponent::AddCurveRightLeftMovement(const FVector MovementDirection, float AxisValue)
 {
 	if(!_movementCurve)
@@ -111,6 +112,7 @@ bool UCharacterCurveMovementComponent::DoJump(bool bReplayingMoves)
 			{
 				SetMovementMode(MOVE_Falling);
 				//Init jump variables in jump function as the jump starts 
+				OnJumpStarted();
 				_isJumping = true;
 				_jumpCurveValues.SetUpCurveValues(_jumpCurve); //Values are set to starting values
 				UE_LOG(LogTemp, Warning, TEXT("Jumpped"));
