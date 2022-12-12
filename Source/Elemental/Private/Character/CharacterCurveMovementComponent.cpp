@@ -17,7 +17,7 @@ void UCharacterCurveMovementComponent::BeginPlay()
 	_jumpCurveValues = CurveValues(_jumpCurve); 
 	_moveCurveValues = CurveValues(_movementCurve);
 	
-	MaxWalkSpeed = _movementCurve->GetFloatValue(_moveCurveValues.MaxCurveTime);
+	MaxWalkSpeed = _movementCurve->GetFloatValue(_moveCurveValues.MaxCurveTime); //Set max walk speed to max curve value 
 }
 
 void UCharacterCurveMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -37,7 +37,7 @@ void UCharacterCurveMovementComponent::AddCurveRightLeftMovement(const FVector M
 		return;
 	}
 
-	AxisValue = FMath::Clamp(AxisValue, -1.0f, 1.0f);
+	AxisValue = FMath::Clamp(AxisValue, -1.0f, 1.0f); //Clamp value between -1 and 1
 	
 	_isMoving = true;
 	_rightAxis = AxisValue;
@@ -53,7 +53,7 @@ void UCharacterCurveMovementComponent::AddCurveForwardBackMovement(const FVector
 		return;
 	}
 
-	AxisValue = FMath::Clamp(AxisValue, -1.0f, 1.0f); //Make sure axis value is clamped
+	AxisValue = FMath::Clamp(AxisValue, -1.0f, 1.0f); //Clamp value between -1 and 1
 	
 	_isMoving = true;
 	_forwardAxis = AxisValue;
